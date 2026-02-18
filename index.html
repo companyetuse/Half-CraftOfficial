@@ -1,2 +1,789 @@
-closed site
-reason: beta testing and releasing...
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Half-Craft | Half Life в Minecraft</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0c0f;
+            --bg-secondary: #12151a;
+            --fg: #e8e8e8;
+            --muted: #6b7280;
+            --accent: #ff6a00;
+            --accent-glow: rgba(255, 106, 0, 0.4);
+            --combine-blue: #0088cc;
+            --resistance-orange: #ff4400;
+            --card: rgba(18, 21, 26, 0.9);
+            --border: rgba(255, 106, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-display {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 106, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 106, 0, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(255, 106, 0, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(0, 136, 204, 0.06) 0%, transparent 50%),
+                linear-gradient(180deg, var(--bg) 0%, #0d1015 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0;
+            animation: float 8s infinite;
+        }
+
+        @keyframes float {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) scale(0);
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1);
+            }
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.1) 2px,
+                rgba(0, 0, 0, 0.1) 4px
+            );
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.3;
+        }
+
+        .lambda-symbol {
+            position: relative;
+            display: inline-block;
+        }
+
+        .lambda-symbol::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+            opacity: 0.5;
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .btn-primary {
+            position: relative;
+            background: linear-gradient(135deg, var(--accent) 0%, #cc5500 100%);
+            border: none;
+            padding: 16px 40px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: white;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px var(--accent-glow);
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-secondary {
+            position: relative;
+            background: transparent;
+            border: 2px solid var(--accent);
+            padding: 14px 38px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent);
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 10px 40px var(--accent-glow);
+        }
+
+        .feature-card {
+            position: relative;
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 24px;
+            transition: all 0.4s ease;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0;
+            background: var(--accent);
+            transition: height 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateX(8px);
+            border-color: var(--accent);
+            box-shadow: -4px 0 30px rgba(255, 106, 0, 0.1);
+        }
+
+        .feature-card:hover::before {
+            height: 100%;
+        }
+
+        .feature-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            color: rgba(255, 106, 0, 0.15);
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .instruction-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 32px;
+            position: relative;
+        }
+
+        .instruction-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+
+        .texture-image {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto 0;
+            display: block;
+            border: 2px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+
+        .texture-image:hover {
+            transform: scale(1.02);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .faction-btn {
+            position: relative;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            padding: 16px 20px;
+            width: 100%;
+            text-align: left;
+            color: var(--fg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .faction-btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            background: rgba(255, 106, 0, 0.05);
+        }
+
+        .faction-btn.selected {
+            border-color: var(--accent);
+            background: rgba(255, 106, 0, 0.1);
+        }
+
+        .faction-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .faction-btn:disabled .faction-status {
+            display: block;
+        }
+
+        .faction-status {
+            display: none;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .input-field {
+            width: 100%;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            padding: 16px 20px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 16px;
+            color: var(--fg);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(255, 106, 0, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: var(--muted);
+        }
+
+        .server-ip {
+            background: rgba(255, 106, 0, 0.1);
+            border: 2px solid var(--accent);
+            padding: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            text-align: center;
+            color: var(--accent);
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--accent);
+        }
+
+        .hero-title {
+            animation: glitch 5s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { text-shadow: none; }
+            91% { text-shadow: -2px 0 var(--combine-blue), 2px 0 var(--accent); }
+            92% { text-shadow: 2px 0 var(--combine-blue), -2px 0 var(--accent); }
+            93% { text-shadow: none; }
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+        .stagger-5 { animation-delay: 0.5s; }
+        .stagger-6 { animation-delay: 0.6s; }
+        .stagger-7 { animation-delay: 0.7s; }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .particle,
+            .hero-title,
+            .lambda-symbol::before {
+                animation: none;
+            }
+            .fade-in {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .success-message {
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: rgba(255, 106, 0, 0.1);
+            border: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: successPulse 2s ease infinite;
+        }
+
+        @keyframes successPulse {
+            0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+            50% { box-shadow: 0 0 0 20px transparent; }
+        }
+
+        .credits-section {
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    <div class="bg-grid"></div>
+    <div class="particles" id="particles"></div>
+    <div class="scanline"></div>
+
+    <main class="relative z-10">
+        <header class="min-h-screen flex items-center justify-center px-4 py-20">
+            <div class="text-center max-w-4xl">
+                <div class="lambda-symbol mb-8 fade-in stagger-1">
+                    <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+                        <path d="M60 10L25 110H45L60 70L75 110H95L60 10Z" stroke="#ff6a00" stroke-width="4" fill="rgba(255,106,0,0.1)"/>
+                    </svg>
+                </div>
+                
+                <h1 class="font-display text-6xl md:text-8xl font-black mb-6 hero-title fade-in stagger-2" style="color: var(--fg);">
+                    HALF<span style="color: var(--accent);">-</span>CRAFT
+                </h1>
+                
+                <p class="text-lg md:text-xl text-gray-400 mb-4 fade-in stagger-3">
+                    HALF LIFE в Minecraft
+                </p>
+                
+                <div class="w-32 h-1 mx-auto mb-12 fade-in stagger-3" style="background: linear-gradient(90deg, transparent, var(--accent), transparent);"></div>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in stagger-4">
+                    <button class="btn-primary" onclick="downloadMods()">
+                        Скачать Моды
+                    </button>
+                    <button class="btn-secondary" onclick="openPlayModal()">
+                        Играть
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <section class="py-20 px-4">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-center mb-16 fade-in">
+                    <span style="color: var(--accent);">СВОБОДНЫЙ</span> МИР
+                </h2>
+                
+                <div class="space-y-4">
+                    <div class="feature-card fade-in stagger-1">
+                        <span class="feature-number">01</span>
+                        <h3 class="font-display text-lg font-bold mb-2">Выбери сторону</h3>
+                        <p class="text-gray-400">Определи свою судьбу в войне за мир</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in stagger-2">
+                        <span class="feature-number">02</span>
+                        <h3 class="font-display text-lg font-bold mb-2">Сражайся до последнего</h3>
+                        <p class="text-gray-400">Противостояние противнику в бескомпромиссных битвах</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in stagger-3">
+                        <span class="feature-number">03</span>
+                        <h3 class="font-display text-lg font-bold mb-2">Захвати мир</h3>
+                        <p class="text-gray-400">Расширь влияние своей фракции на всю территорию</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in stagger-4">
+                        <span class="feature-number">04</span>
+                        <h3 class="font-display text-lg font-bold mb-2">Построй базу</h3>
+                        <p class="text-gray-400">Создай неприступную крепость для своей команды</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in stagger-5">
+                        <span class="feature-number">05</span>
+                        <h3 class="font-display text-lg font-bold mb-2">Захвати Базу</h3>
+                        <p class="text-gray-400">Штурмуй вражеские укрепления и забирай трофеи</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in stagger-6">
+                        <span class="feature-number">06</span>
+                        <h3 class="font-display text-lg font-bold mb-2">Защити Базу</h3>
+                        <p class="text-gray-400">Оборони свои территории от захватчиков</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 px-4">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-center mb-16 fade-in">
+                    <span style="color: var(--accent);">ИНСТРУКЦИЯ</span>
+                </h2>
+                
+                <div class="instruction-box fade-in">
+                    <h3 class="font-display text-xl font-bold mb-4">Установка текстурпаков</h3>
+                    <p class="text-gray-300 mb-4">
+                        Для приятной игры на сервере нужно в правильном порядке расставить текстур паки.
+                    </p>
+                    
+                    <div class="mt-8">
+                        <img src="texturepacks.png" alt="Порядок текстурпаков" class="texture-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="py-12 px-4 border-t" style="border-color: var(--border);">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="credits-section">
+                    <p class="text-gray-300 font-display text-lg mb-2">
+                        Было создано <span style="color: var(--accent);">Easyg</span> (Создатель)
+                    </p>
+                </div>
+                <p class="text-gray-500 text-sm mt-6">
+                    HALF-CRAFT © 2024 | Неофициальный проект
+                </p>
+            </div>
+        </footer>
+    </main>
+
+    <div class="modal-overlay" id="playModal">
+        <div class="modal">
+            <button class="close-btn" onclick="closePlayModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+            
+            <div id="modalContent">
+                <h3 class="font-display text-2xl font-bold mb-6">Выбери сторону</h3>
+                
+                <div class="mb-6">
+                    <button class="faction-btn" data-faction="Сопротивление" onclick="selectFaction(this)">
+                        <span class="font-display font-bold">Сопротивление</span>
+                        <span class="text-sm" style="color: var(--resistance-orange);">Доступно</span>
+                    </button>
+                    
+                    <button class="faction-btn" data-faction="Альянс" onclick="selectFaction(this)">
+                        <span class="font-display font-bold">Альянс</span>
+                        <span class="text-sm" style="color: var(--combine-blue);">Доступно</span>
+                    </button>
+                    
+                    <button class="faction-btn" disabled data-faction="HECU">
+                        <span class="font-display font-bold">HECU</span>
+                        <span class="faction-status">В разработке</span>
+                    </button>
+                    
+                    <button class="faction-btn" disabled data-faction="Зомби">
+                        <span class="font-display font-bold">Зомби</span>
+                        <span class="faction-status">В разработке</span>
+                    </button>
+                    
+                    <button class="faction-btn" disabled data-faction="Муравьиные Львы">
+                        <span class="font-display font-bold">Муравьиные Львы</span>
+                        <span class="faction-status">В разработке</span>
+                    </button>
+                </div>
+                
+                <div class="mb-6">
+                    <input type="text" class="input-field" id="playerName" placeholder="Введи свой ник" maxlength="20">
+                </div>
+                
+                <button class="btn-primary w-full" onclick="submitPlay()" id="submitBtn" disabled>
+                    Присоединиться
+                </button>
+            </div>
+            
+            <div id="successContent" style="display: none;">
+                <div class="success-message">
+                    <div class="success-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff6a00" stroke-width="2">
+                            <path d="M20 6L9 17l-5-5"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-display text-2xl font-bold mb-4">Добро пожаловать на сервер</h3>
+                    <p class="text-gray-400 mb-6">Желаем хорошей игры!</p>
+                    
+                    <p class="text-sm text-gray-500 mb-2">IP Сервера:</p>
+                    <div class="server-ip">halflife2.aternos.me:56891</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TELEGRAM_TOKEN = '8153409278:AAH6Hg-uDRZC6qZUF6qXlvt2J94lXpHyahQ';
+        const TELEGRAM_CHAT_ID = '6627989870';
+        
+        let selectedFaction = null;
+        
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+                container.appendChild(particle);
+            }
+        }
+        
+        function downloadMods() {
+            window.open('https://gofile.io/d/CyQl5v', '_blank');
+        }
+        
+        function openPlayModal() {
+            const modal = document.getElementById('playModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            resetModal();
+        }
+        
+        function closePlayModal() {
+            const modal = document.getElementById('playModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        function resetModal() {
+            selectedFaction = null;
+            document.getElementById('playerName').value = '';
+            document.getElementById('submitBtn').disabled = true;
+            document.querySelectorAll('.faction-btn:not(:disabled)').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.getElementById('modalContent').style.display = 'block';
+            document.getElementById('successContent').style.display = 'none';
+        }
+        
+        function selectFaction(btn) {
+            if (btn.disabled) return;
+            
+            document.querySelectorAll('.faction-btn:not(:disabled)').forEach(b => {
+                b.classList.remove('selected');
+            });
+            btn.classList.add('selected');
+            selectedFaction = btn.dataset.faction;
+            validateForm();
+        }
+        
+        function validateForm() {
+            const name = document.getElementById('playerName').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = !(selectedFaction && name.length >= 2);
+        }
+        
+        document.getElementById('playerName').addEventListener('input', validateForm);
+        
+        function submitPlay() {
+            const name = document.getElementById('playerName').value.trim();
+            
+            if (!selectedFaction || name.length < 2) return;
+            
+            sendToTelegram(name, selectedFaction);
+            
+            document.getElementById('modalContent').style.display = 'none';
+            document.getElementById('successContent').style.display = 'block';
+        }
+        
+        function sendToTelegram(name, faction) {
+            const message = `Новый игрок на Half-Craft\n\nНик: ${name}\nФракция: ${faction}`;
+            
+            const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: message
+                })
+            }).catch(err => {
+                console.log('Sent');
+            });
+        }
+        
+        document.getElementById('playModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePlayModal();
+            }
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePlayModal();
+            }
+        });
+        
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.fade-in').forEach(el => {
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
+        });
+        
+        createParticles();
+    </script>
+</body>
+</html>
