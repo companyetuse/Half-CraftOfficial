@@ -617,9 +617,9 @@
                         <span class="text-sm" style="color: var(--resistance-orange);">Доступно</span>
                     </button>
                     
-                    <button class="faction-btn" data-faction="Альянс" onclick="selectFaction(this)">
+                    <button class="faction-btn" disabled data-faction="Альянс">
                         <span class="font-display font-bold">Альянс</span>
-                        <span class="text-sm" style="color: var(--combine-blue);">Доступно</span>
+                        <span class="faction-status">Только ИИ</span>
                     </button>
                     
                     <button class="faction-btn" data-faction="HECU" onclick="selectFaction(this)">
@@ -627,14 +627,14 @@
                         <span class="text-sm" style="color: #fbbf24;">BETA</span>
                     </button>
                     
-                    <button class="faction-btn" disabled data-faction="Зомби">
+                    <button class="faction-btn" data-faction="Зомби" onclick="selectFaction(this)">
                         <span class="font-display font-bold">Зомби</span>
-                        <span class="faction-status">В разработке</span>
+                        <span class="text-sm" style="color: #fbbf24;">BETA</span>
                     </button>
                     
                     <button class="faction-btn" disabled data-faction="Муравьиные Львы">
                         <span class="font-display font-bold">Муравьиные Львы</span>
-                        <span class="faction-status">В разработке</span>
+                        <span class="faction-status">Только ИИ</span>
                     </button>
                 </div>
                 
